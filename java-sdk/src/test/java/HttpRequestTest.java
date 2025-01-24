@@ -109,6 +109,7 @@ public class HttpRequestTest {
 
         @Disabled
         void testFailedCredentials() {
+            //This is a secret that should fail
             String failing_secret = "12345546456.eEOnHH-KtchAddmo";
             try (TokenRequest requestToken = TokenRequest.Builder()
                     .setTenantId(TENANT_ID)
