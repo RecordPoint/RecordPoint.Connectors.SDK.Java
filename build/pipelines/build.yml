@@ -1,6 +1,5 @@
 trigger:
-  - main
-  - develop
+  - release
 
 variables:
   - name: buildName
@@ -11,7 +10,6 @@ variables:
     readonly: true
 pool:
   vmImage: ubuntu-latest
-
 
 stages:
   - stage: Publish
