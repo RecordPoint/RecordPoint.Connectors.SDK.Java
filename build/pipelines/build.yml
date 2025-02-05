@@ -1,0 +1,72 @@
+trigger:
+  - main
+  - develop
+
+variables:
+  - name: buildName
+    value: 'JavaSDK_v$(Build.BuildNumber)'
+    readonly: true
+  - name: artifactName
+    value: '$(Build.ArtifactStagingDirectory)/$(buildName)'
+    readonly: true
+pool:
+  vmImage: ubuntu-latest
+
+
+stages:
+  - stage: Publish
+    displayName: 'Build and Publish'
+    jobs:
+      - job:
+        displayName: 'Build and Publish'
+        steps:
+          - checkout: self
+            persistCredentials: true
+
+          - task: Bash@3
+            displayName: 'Prepare Maven and GPG'
+            inputs:
+              targetType: inline
+              script: |
+                mkdir -p ~/.m2/
+                echo 'Import GPG key here'
+                cat <<EOF > ~/.m2/settings.xml
+                <settings>
+                  <servers>
+                    <server>
+                      <id>central</id>
+                      <username>$MVN_USERNAME</username>
+                      <password>$MVN_PASSWORD</password>
+                    </server>
+                  </servers>
+                </settings>
+                EOF
+            env:
+              MVN_USERNAME: 'recordpoint'
+              MVN_PASSWORD: 'set me'
+
+          - task: Maven@4
+            inputs:
+              mavenPomFile: 'pom.xml'
+              mavenOptions: '-Xmx4096m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '17'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              goals: 'compile'
+
+          - task: Bash@3
+            displayName: 'Push to Github'
+            inputs:
+              targetType: inline
+              script: |
+                echo "Branch is ${BRANCH_NAME}"
+                git fetch --unshallow
+                git checkout ${BRANCH_NAME}
+                git branch --show-current
+                git remote add gh "https://${GITHUB_PAT_ENV_VAR}@github.com/RecordPoint/RecordPoint.Connectors.SDK.Java.git"
+                git push --force -u gh ${BRANCH_NAME}:main
+            env:
+              BRANCH_NAME: $(Build.SourceBranchName)
+              GITHUB_PAT_ENV_VAR: $(GITHUB_PAT)
