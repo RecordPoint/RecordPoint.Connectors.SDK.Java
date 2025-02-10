@@ -11,11 +11,11 @@ The RecordPoint Connector SDK is available on Maven Central and can be added to 
 <dependency>
     <groupId>com.recordpoint</groupId>
     <artifactId>recordpoint-connector-sdk</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
-*Note:* Check Maven Central for the latest version to use.
+*Note:* Check [Maven Central](https://central.sonatype.com/artifact/com.recordpoint/recordpoint-connector-sdk) for the latest version to use.
 
 ## Microsoft Entra ID
 If using Microsoft Entra ID for authentication (the default), the Microsoft `azure-identity` library must also be included:
@@ -51,7 +51,7 @@ the OKHttpClient instead by including the following instead:
 used in conjunction with the RecordPoint SDK.
 
 # Documentation
-JavaDoc is available at [javadoc.io](https://javadoc.io) or see below for helpful examples.
+JavaDoc is available at [javadoc.io](https://javadoc.io/doc/com.recordpoint/recordpoint-connector-sdk/latest/index.html) or see below for helpful examples.
 
 # Usage
 ## 1. Creating an authentication manager

@@ -30,6 +30,17 @@ stages:
                 echo 'Import GPG key here'
                 cat <<EOF > ~/.m2/settings.xml
                 <settings>
+                  <profiles>
+                    <profile>
+                      <id>sonatype</id>
+                      <activation>
+                        <activeByDefault>true</activeByDefault>
+                      </activation>
+                      <properties>
+                        <gpg.passphrase>$GPG_PASSPHRASE</gpg.passphrase>
+                      </properties>
+                    </profile>
+                  </profiles>
                   <servers>
                     <server>
                       <id>central</id>
@@ -40,8 +51,9 @@ stages:
                 </settings>
                 EOF
             env:
-              MVN_USERNAME: 'recordpoint'
+              MVN_USERNAME: 'set me'
               MVN_PASSWORD: 'set me'
+              GPG_PASSPHRASE: 'set me'
 
           - task: Maven@4
             inputs:
