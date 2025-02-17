@@ -4,6 +4,7 @@ import com.recordpoint.connectors.sdk.service.ServiceResponse;
 import com.recordpoint.connectors.sdk.service.model.Metadata;
 
 import java.time.Instant;
+import java.util.List;
 
 public class NotificationItem implements ServiceResponse {
 
@@ -77,7 +78,7 @@ public class NotificationItem implements ServiceResponse {
 
     private String correlationId;
 
-    private Metadata sourceProperties;
+    private List<Metadata> sourceProperties;
 
     public String getId() {
         return id;
@@ -359,11 +360,11 @@ public class NotificationItem implements ServiceResponse {
         this.correlationId = correlationId;
     }
 
-    public Metadata getSourceProperties() {
+    public List<Metadata> getSourceProperties() {
         return sourceProperties;
     }
 
-    public void setSourceProperties(Metadata sourceProperties) {
+    public void setSourceProperties(List<Metadata> sourceProperties) {
         this.sourceProperties = sourceProperties;
     }
 }

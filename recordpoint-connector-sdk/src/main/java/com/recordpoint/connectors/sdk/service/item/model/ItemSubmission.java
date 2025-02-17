@@ -5,12 +5,39 @@ import com.recordpoint.connectors.sdk.service.ServicePayload;
 import com.recordpoint.connectors.sdk.service.binary.model.DirectBinarySubmission;
 import com.recordpoint.connectors.sdk.service.model.Metadata;
 import com.recordpoint.connectors.sdk.service.model.RelationshipData;
+import com.recordpoint.connectors.sdk.service.notification.model.Notification;
 import com.recordpoint.connectors.sdk.service.util.MessageFieldProvider;
 
 import java.time.Instant;
 import java.util.List;
 
 public class ItemSubmission implements ServicePayload {
+
+    public enum MediaType {
+        ELECTRONIC("Electronic"),
+        PHYSICAL("Physical");
+
+        private final String value;
+
+        MediaType(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+
+        public static MediaType fromValue(String value) {
+            for (MediaType mt : values()) {
+                if (mt.value.equals(value)) {
+                    return mt;
+                }
+            }
+
+            return null;
+        }
+    }
 
     private final String securityProfileIdentifier;
     private final List<Metadata> sourceProperties;
@@ -237,6 +264,11 @@ public class ItemSubmission implements ServicePayload {
 
         public Builder setMediaType(String mediaType) {
             this.mediaType = mediaType;
+            return this;
+        }
+
+        public Builder setMediaType(MediaType mediaType) {
+            this.mediaType = mediaType.toString();
             return this;
         }
 

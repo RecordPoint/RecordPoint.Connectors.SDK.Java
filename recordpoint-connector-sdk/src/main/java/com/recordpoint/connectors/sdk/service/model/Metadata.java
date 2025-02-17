@@ -1,6 +1,7 @@
 package com.recordpoint.connectors.sdk.service.model;
 
 import java.time.Instant;
+import java.util.StringJoiner;
 
 public final class Metadata {
     private String name;
@@ -89,4 +90,12 @@ public final class Metadata {
         }
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Metadata.class.getSimpleName() + "[", "]")
+                .add("name='" + name + "'")
+                .add("type='" + type + "'")
+                .add("value='" + value + "'")
+                .toString();
+    }
 }

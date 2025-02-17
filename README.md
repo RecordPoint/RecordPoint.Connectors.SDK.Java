@@ -1,7 +1,6 @@
 # Overview
 The RecordPoint Connector SDK for Java makes building custom connectors that integrate with RecordPoint's Connector 
-Framework easy.
-This SDK enables developers to create connectors that can synchronize content and records from various data sources 
+Framework easy. This SDK enables developers to create connectors that can synchronize content and records from various data sources 
 into RecordPoint and manage disposal events.
 
 # Installation
@@ -49,6 +48,9 @@ the OKHttpClient instead by including the following instead:
 
 *Note:* Replacing the `netty` dependency will prevent interactive authentication from working, but this is typically not 
 used in conjunction with the RecordPoint SDK.
+
+## Java version
+This SDK is designed to work with Java 17 or above.
 
 # Documentation
 JavaDoc is available at [javadoc.io](https://javadoc.io/doc/com.recordpoint/recordpoint-connector-sdk/latest/index.html) or see below for helpful examples.
@@ -178,10 +180,76 @@ auditEventServiceClient.submitContentSourceEvent(SubmitSourceEventRequest.Builde
         .build());
 ```
 
-Other clients available include:
+## 4. Handling Notifications
+Connectors can receive five types of notifications: `Ping`, `ItemDestroyed`, `ConnectorConfigCreated`, `ConnectorConfigUpdated` and `ConnectorConfigCreated`.
+The most common and useful event is `ItemDestroyed` which is issues when an item is disposed from the platform. This event should trigger the
+secure and permanent destruction of the data in the source system. To make this simple to implement, the connector provides the item details
+to allow the connector to easily locate the item to destroy:
 
-- Aggregations
-- Notifications (for receiving and sending disposal notifications)
+```java
+NotificationServiceClient notificationServiceClient = NotificationServiceClient.Builder()
+        .setServiceSettings(settings)
+        .setTokenManager(tokenManager)
+        .build();
+
+List<Notification> notifications = notificationServiceClient.getNotificationList(GetNotificationRequest.Builder()
+        .setConnectorId(connectorId)
+        .build()
+);
+
+for (Notification notification : notifications) {
+    if (Notification.NotificationType.ITEM_DESTROYED.equals(notification.getNotificationType())) {
+        LOG.info(
+                "Deleting item: externalID={}; title={}; author={}, sourceProperties={}",
+                notification.getItem().getExternalId(), notification.getItem().getTitle(),
+                notification.getItem().getAuthor(), notification.getItem().getSourceProperties()
+        );
+        // Perform deletion here
+    }
+```
+
+Once the item is destroyed, or an non-retryable error has occurred, the notification should be acknowledged so that the
+item can be marked as successfully destroyed or noted that disposal failed:
+
+```java
+notificationServiceClient.acknowledgeProcessedNotification(AcknowledgeNotificationRequest.Builder()
+        .setNotificationAcknowledge(NotificationAcknowledge.Builder()
+                .setConnectorId(connectorId)
+                .setNotificationId(notification.getId())
+                .setConnectorStatusMessage("Item destroyed using Java SDK!")
+                .setProcessingResult(NotificationAcknowledge.ProcessingResult.OK)
+                .build()
+        )
+        .build()
+);
+}
+```
+
+# Examples
+## Java Example (`recordpoint-connector-sdk-java-example`)
+An example of using the SDK in a Java-based Micronaut application is included in this repository. This includes examples
+of authenticating, importing from a CSV file, submitting custom audit events, and managing notifications. The example 
+provides a command line application and can be called using:
+```shell
+# Import a CSV
+java -jar target/recordpoint-connector-sdk-java-sample-1.0.2.jar --csv=src/test/resources/books.csv --tenant-id=$TENANT_ID \
+--client-id=$CLIENT_ID --connector-id=$CONNECTOR_ID --external-id=id --title=title --author=author --location=location \
+--double-properties=rating,msrp --datetime-properties=published --boolean-properties=IsFiction --region=CAC \
+--last-modified=2024-01-13T00:00:00Z
+
+# Submit an audit event
+java -jar target/recordpoint-connector-sdk-java-sample-1.0.2.jar audit --tenant-id=$TENANT_ID \
+--client-id=$CLIENT_ID --connector-id=$CONNECTOR_ID --region=CAC
+
+# Handle notifications
+java -jar target/recordpoint-connector-sdk-java-sample-1.0.2.jar notifications --tenant-id=$TENANT_ID \
+--client-id=$CLIENT_ID --connector-id=$CONNECTOR_ID --region=CAC
+```
+
+This example can also be run using GraalVM by building it as a native image.
+
+## Scala Example (`recordpoint-connector-sdk-scala-example`)
+A short example showing the use of the SDK in a Scala test (or application).
 
 # License
 Licensed under Apache 2.0, see LICENSE
