@@ -251,5 +251,20 @@ This example can also be run using GraalVM by building it as a native image.
 ## Scala Example (`recordpoint-connector-sdk-scala-example`)
 A short example showing the use of the SDK in a Scala test (or application).
 
+## Spark Example (`recordpoint-connector-sdk-spark-example`)
+A short example of submitting items from a SparkSQL dataframe using Apache Spark. To run this example, set
+```shell
+export REGION="CAC"
+export TENANT_ID="..."
+export CONNECTOR_ID="..."
+export CLIENT_ID="..."
+export CLIENT_SECRET="..."
+
+# --add-opens flags required if using Java 17+ and Spark <4.0.0
+java --add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
+     --add-opens=java.base/sun.util.calendar=ALL-UNNAMED \
+     -jar target/recordpoint-connector-sdk-spark-sample-1.0.2.jar
+```
+
 # License
 Licensed under Apache 2.0, see LICENSE

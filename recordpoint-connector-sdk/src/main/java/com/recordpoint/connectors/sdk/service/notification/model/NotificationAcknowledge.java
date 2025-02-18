@@ -24,6 +24,7 @@ public class NotificationAcknowledge implements ServicePayload {
          * to the notification type
          */
         CONNECTOR_NOT_SUBSCRIBED("ConnectorNotSubscribed"),
+
         /**
          * Indicates that the notification was not processed because the connector could not be reached.
          */
@@ -55,7 +56,6 @@ public class NotificationAcknowledge implements ServicePayload {
             return null;
         }
     }
-
 
     private String connectorId;
     private String notificationId;
