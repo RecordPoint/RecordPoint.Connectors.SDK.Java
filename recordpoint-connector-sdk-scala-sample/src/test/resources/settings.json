@@ -1,10 +1,10 @@
 {
-  "ConnectorApiUrl": "https://connector-int.r365.one",
-  "TenantId": "893805a7-92f4-4689-ae1d-37fb9c5c8e6d",
+  "ConnectorApiUrl": "https://connector-cac.records365.ca",
+  "TenantId": "83c9c011-620a-4547-bed0-9af87795e0bf",
   "ClientId": "",
   "Audience": "https://management.azure.com/.default",
   "externalId": "c24c780d-7fe4-4b40-a8f6-219da2e10151",
-  "ConnectorId": "6ec0c3e3-f527-4ce1-a22e-9b4a76d51b39",
+  "ConnectorId": "c6bcf1c8-4a17-4c46-957b-b314536e6c44",
   "title": "test aggregation",
   "sourceLastModifiedDate": "2024-12-27T10:39:07.713131Z",
   "sourceLastModifiedBy": "java SDK",

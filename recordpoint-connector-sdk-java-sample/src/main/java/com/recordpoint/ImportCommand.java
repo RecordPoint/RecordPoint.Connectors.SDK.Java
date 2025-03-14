@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "import", subcommands = {NotificationCommand.class})
 public class ImportCommand extends BaseCommand implements Runnable {
@@ -165,7 +166,7 @@ public class ImportCommand extends BaseCommand implements Runnable {
         builder.setSourceProperties(
                 properties.entrySet().stream()
                         .map(this::convertMapToMetadataList)
-                        .toList()
+                        .collect(Collectors.toUnmodifiableList())
         );
 
         return builder.build();

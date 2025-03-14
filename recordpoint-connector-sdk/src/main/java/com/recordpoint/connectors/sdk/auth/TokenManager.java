@@ -11,9 +11,8 @@ import java.io.Closeable;
  * The simplest example of a TokenManager implementation that reads from an environment variable is:
  *
  * <pre>
- * {@code
  * public class EnvTokenManager implements TokenManager {
- *     @Override
+ *     &#64;Override
  *     public String getAccessToken() throws TokenResponseException {
  *         if (System.getenv("RECORDPOINT_ACCESS_TOKEN") != null) {
  *             return System.getenv("RECORDPOINT_ACCESS_TOKEN");
@@ -21,14 +20,13 @@ import java.io.Closeable;
  *         throw new TokenResponseException("$RECORDPOINT_ACCESS_TOKEN env variable is not set");
  *     }
  *
- *     @Override
+ *     &#64;Override
  *     public void resetToken() {
  *         System.err.println("Regenerate your authentication token and change the value of $RECORDPOINT_ACCESS_TOKEN");
  *     }
  *
- *     @Override
+ *     &#64;Override
  *     public void close() {}
- * }
  * }
  * </pre>
  */

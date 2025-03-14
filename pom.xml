@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.recordpoint</groupId>
     <artifactId>recordpoint-connector-sdk-parent</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -11,5 +11,6 @@
         <module>recordpoint-connector-sdk-java-sample</module>
         <module>recordpoint-connector-sdk-scala-sample</module>
         <module>recordpoint-connector-sdk-spark-example</module>
+        <module>recordpoint-connector-sdk-java11-sample</module>
     </modules>
 </project>

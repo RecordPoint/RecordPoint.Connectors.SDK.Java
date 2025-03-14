@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class TokenRequest implements Closeable {
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private static ExecutorService executor = Executors.newSingleThreadExecutor();
     private final String tenantId;
     private final String clientId;
     private final String secret;
@@ -33,17 +33,20 @@ public final class TokenRequest implements Closeable {
     }
 
     public synchronized Token getToken() throws TokenResponseException {
-        TokenCredential clientSecretCredential = new ClientSecretCredentialBuilder()
-                .tenantId(this.tenantId)
-                .clientId(this.clientId)
-                .clientSecret(this.secret)
-                .executorService(executorService)
-                .build();
-
-        TokenRequestContext context = new TokenRequestContext();
-        context.addScopes(this.scope);
-
         try {
+            if (executor == null || executor.isShutdown()) {
+                executor = Executors.newSingleThreadExecutor();
+            }
+            TokenCredential clientSecretCredential = new ClientSecretCredentialBuilder()
+                    .tenantId(this.tenantId)
+                    .clientId(this.clientId)
+                    .clientSecret(this.secret)
+                    .executorService(executor)
+                    .build();
+
+            TokenRequestContext context = new TokenRequestContext();
+            context.addScopes(this.scope);
+
             AccessToken jwt = clientSecretCredential.getTokenSync(context);
             Preconditions.checkNotNull(Objects.requireNonNull(jwt).getToken());
             return Token.from(jwt);
@@ -58,7 +61,9 @@ public final class TokenRequest implements Closeable {
 
     @Override
     public void close() throws IOException {
-        executorService.shutdown();
+        if (executor != null && !executor.isShutdown()) {
+            executor.shutdown();
+        }
     }
 
     public static class Builder {
