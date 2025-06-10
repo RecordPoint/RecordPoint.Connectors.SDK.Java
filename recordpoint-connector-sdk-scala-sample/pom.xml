@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.recordpoint</groupId>
         <artifactId>recordpoint-connector-sdk-parent</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6</version>
     </parent>
     <artifactId>recordpoint-connector-sdk-scala-sample</artifactId>
     <name>Scala Example</name>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.recordpoint</groupId>
             <artifactId>recordpoint-connector-sdk</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>

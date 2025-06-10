@@ -8,13 +8,13 @@
     <parent>
         <groupId>com.recordpoint</groupId>
         <artifactId>recordpoint-connector-sdk-parent</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6</version>
     </parent>
     <properties>
         <packaging>jar</packaging>
-        <jdk.version>11</jdk.version>
-        <release.version>11</release.version>
-        <exec.mainClass>com.recordpoint.examples.spark.Application</exec.mainClass>
+        <jdk.version>8</jdk.version>
+        <release.version>8</release.version>
+        <exec.mainClass>com.recordpointcx.spark.Application</exec.mainClass>
     </properties>
 
     <repositories>
@@ -41,12 +41,13 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.5.16</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.recordpoint</groupId>
             <artifactId>recordpoint-connector-sdk</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.6</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.azure</groupId>
@@ -73,6 +74,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.azure</groupId>
@@ -99,6 +101,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core-http-okhttp</artifactId>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -110,11 +113,13 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.12</artifactId>
             <version>3.5.4</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.12</artifactId>
             <version>3.5.4</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>

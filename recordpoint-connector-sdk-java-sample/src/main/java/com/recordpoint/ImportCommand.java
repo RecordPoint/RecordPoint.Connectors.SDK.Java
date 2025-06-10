@@ -166,7 +166,7 @@ public class ImportCommand extends BaseCommand implements Runnable {
         builder.setSourceProperties(
                 properties.entrySet().stream()
                         .map(this::convertMapToMetadataList)
-                        .collect(Collectors.toUnmodifiableList())
+                        .collect(Collectors.toList())
         );
 
         return builder.build();
@@ -193,6 +193,7 @@ public class ImportCommand extends BaseCommand implements Runnable {
                             .fileName(row.get(titleColumn) + ".json")
                             .mimeType("application/json")
                             .fileSize(data.getBytes().length)
+                            .sourceLastModifiedDate(Instant.now())
                             .build()
                     )
                     .build()

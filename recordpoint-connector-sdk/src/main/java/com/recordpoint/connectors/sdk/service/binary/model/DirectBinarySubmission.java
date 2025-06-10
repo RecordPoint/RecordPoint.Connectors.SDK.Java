@@ -25,6 +25,7 @@ public class DirectBinarySubmission implements ServicePayload {
         Preconditions.checkNotNull(builder.binaryExternalId, MessageFieldProvider.getMessage("field.binaryExternalId"));
         Preconditions.checkNotNull(builder.connectorId, MessageFieldProvider.getMessage("field.connectorId"));
         Preconditions.checkNotNull(builder.itemExternalId, MessageFieldProvider.getMessage("field.itemExternalId"));
+        Preconditions.checkNotNull(builder.sourceLastModifiedDate, MessageFieldProvider.getMessage("field.sourceLastModifiedDate"));
         this.mimeType = builder.mimeType;
         this.fileSize = builder.fileSize;
         this.fileHash = builder.fileHash;

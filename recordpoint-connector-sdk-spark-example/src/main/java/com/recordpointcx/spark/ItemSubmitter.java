@@ -1,6 +1,5 @@
-package com.recordpoint.examples.spark;
+package com.recordpointcx.spark;
 
-import com.recordpoint.connectors.sdk.auth.MsalTokenManager;
 import com.recordpoint.connectors.sdk.auth.TokenManager;
 import com.recordpoint.connectors.sdk.http.exception.HttpExecutionException;
 import com.recordpoint.connectors.sdk.http.exception.HttpResponseException;
@@ -19,9 +18,11 @@ import org.apache.spark.sql.types.StructField;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ItemSubmitter {
     private static ItemSubmitter instance;
@@ -45,9 +46,9 @@ public class ItemSubmitter {
 
     private boolean submitBinary = false;
 
-    private ItemSubmitter() throws JsonMapperException {
-        serviceSettings = getServiceSettings();
-        tokenManager = new MsalTokenManager(serviceSettings);
+    private ItemSubmitter(ServiceSettings serviceSettings, TokenManager tokenManager) throws JsonMapperException {
+        this.serviceSettings = serviceSettings;
+        this.tokenManager = tokenManager;
         itemServiceClient = ItemServiceClient.Builder()
                 .setServiceSettings(serviceSettings)
                 .setTokenManager(tokenManager)
@@ -59,9 +60,17 @@ public class ItemSubmitter {
                 .build();
     }
 
+    public static ItemSubmitter getInstance(ServiceSettings serviceSettings, TokenManager tokenManager) throws JsonMapperException {
+        if (instance == null) {
+            instance = new ItemSubmitter(serviceSettings, tokenManager);
+        }
+
+        return instance;
+    }
+
     public static ItemSubmitter getInstance() throws JsonMapperException {
         if (instance == null) {
-            instance = new ItemSubmitter();
+            throw new IllegalStateException("ItemSubmitter has not been initialized");
         }
 
         return instance;
@@ -103,70 +112,48 @@ public class ItemSubmitter {
         this.submitBinary = submitBinary;
     }
 
-    protected ServiceSettings getServiceSettings() throws JsonMapperException {
-        ServiceSettings.Builder builder = ServiceSettings.Builder();
-
-        if (System.getenv("RP_CONFIG") != null) {
-            builder = builder.fromJsonFile(Path.of(System.getenv("RP_CONFIG")));
-        }
-
-        if (System.getenv("CONNECTOR_ID") != null) {
-            builder = builder.setConnectorId(System.getenv("CONNECTOR_ID"));
-        }
-
-        if (System.getenv("CLIENT_ID") != null) {
-            builder = builder.setClientId(System.getenv("CLIENT_ID"));
-        }
-
-        if (System.getenv("CLIENT_SECRET") != null) {
-            builder = builder.setSecret(System.getenv("CLIENT_SECRET"));
-        }
-
-        if (System.getenv("TENANT_ID") != null) {
-            builder = builder.setTenantId(System.getenv("TENANT_ID"));
-        }
-
-        if (System.getenv("REGION") != null) {
-            builder = builder.setRegion(ServiceSettings.Regions.valueOf(System.getenv("REGION")));
-        }
-
-        if (System.getenv("REGION_URL") != null) {
-            builder = builder.setBaseUrl(System.getenv("REGION_URL"));
-        }
-
-        return builder.build();
+    public ServiceSettings getServiceSettings() {
+        return serviceSettings;
     }
 
     protected Metadata mapField(Row row, StructField field) {
-        if (field.dataType().sameType(DataTypes.BooleanType)) {
-            return Metadata.of(field.name(), row.getBoolean(row.fieldIndex(field.name())));
+        try {
+            if (field.dataType().sameType(DataTypes.BooleanType)) {
+                return Metadata.of(field.name(), row.getBoolean(row.fieldIndex(field.name())));
+            }
+
+            if (field.dataType().sameType(DataTypes.StringType)) {
+                return Metadata.of(field.name(), row.getString(row.fieldIndex(field.name())));
+            }
+
+            if (field.dataType().sameType(DataTypes.IntegerType)) {
+                return Metadata.of(field.name(), row.getInt(row.fieldIndex(field.name())));
+            }
+
+            if (field.dataType().sameType(DataTypes.LongType)) {
+                return Metadata.of(field.name(), (int) row.getLong(row.fieldIndex(field.name())));
+            }
+
+            if (field.dataType().sameType(DataTypes.DoubleType)) {
+                return Metadata.of(field.name(), row.getDouble(row.fieldIndex(field.name())));
+            }
+
+            if (field.dataType().sameType(DataTypes.FloatType)) {
+                return Metadata.of(field.name(), (double) row.getFloat(row.fieldIndex(field.name())));
+            }
+
+            if (field.dataType().sameType(DataTypes.DateType)) {
+                return Metadata.of(field.name(), row.getDate(row.fieldIndex(field.name())).toInstant());
+            }
+
+            if (field.dataType().sameType(DataTypes.TimestampType)) {
+                return Metadata.of(field.name(), row.getInstant(row.fieldIndex(field.name())));
+            }
+        } catch (Exception e) {
+            return null;
         }
 
-        if (field.dataType().sameType(DataTypes.StringType)) {
-            return Metadata.of(field.name(), row.getString(row.fieldIndex(field.name())));
-        }
-
-        if (field.dataType().sameType(DataTypes.IntegerType)) {
-            return Metadata.of(field.name(), row.getInt(row.fieldIndex(field.name())));
-        }
-
-        if (field.dataType().sameType(DataTypes.DoubleType)) {
-            return Metadata.of(field.name(), row.getDouble(row.fieldIndex(field.name())));
-        }
-
-        if (field.dataType().sameType(DataTypes.FloatType)) {
-            return Metadata.of(field.name(), (double) row.getFloat(row.fieldIndex(field.name())));
-        }
-
-        if (field.dataType().sameType(DataTypes.DateType)) {
-            return Metadata.of(field.name(), row.getDate(row.fieldIndex(field.name())).toInstant());
-        }
-
-        if (field.dataType().sameType(DataTypes.TimestampType)) {
-            return Metadata.of(field.name(), row.getInstant(row.fieldIndex(field.name())));
-        }
-
-        throw new UnsupportedOperationException("Unknown field type: " + field.dataType() + " for field " + field.name());
+        return null;
     }
 
     protected ItemSubmission buildItemSubmission(Row row) {
@@ -187,7 +174,9 @@ public class ItemSubmitter {
         builder.setSourceCreatedDate(row.getInstant(row.fieldIndex(createdDateColumn)));
 
         builder.setSourceProperties(
-                Arrays.stream(row.schema().fields()).map(field -> mapField(row, field)).toList()
+                Arrays.stream(row.schema().fields()).map(field -> mapField(row, field))
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
         );
 
         return builder.build();
@@ -211,10 +200,11 @@ public class ItemSubmitter {
                 .setFileSubmissionInfo(DirectBinarySubmission.Builder()
                         .itemExternalId(row.getString(row.fieldIndex(externalIdColumn)))
                         .connectorId(serviceSettings.getConnectorId())
-                        .binaryExternalId(UUID.randomUUID().toString())
+                        .binaryExternalId(row.getString(row.fieldIndex(externalIdColumn)))
                         .fileName(row.getString(row.fieldIndex(externalIdColumn)) + ".json")
                         .mimeType("application/json")
                         .fileSize(data.getBytes().length)
+                        .sourceLastModifiedDate(Instant.now())
                         .build()
                 )
                 .build());
