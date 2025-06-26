@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A custom {@link AbstractHttpEntity} implementation that represents a streaming content entity.
@@ -38,7 +39,7 @@ final class ApacheContentEntity extends AbstractHttpEntity {
             String contentType,
             String contentEncoding) {
         super(contentType, contentEncoding, false);
-        this.contentLength = jsonContent.length();
+        this.contentLength = jsonContent.getBytes(StandardCharsets.UTF_8).length;
         this.jsonContent = jsonContent;
     }
 
@@ -60,7 +61,7 @@ final class ApacheContentEntity extends AbstractHttpEntity {
      */
     @Override
     public long getContentLength() {
-        return jsonContent.length();
+        return contentLength;
     }
 
     /**
