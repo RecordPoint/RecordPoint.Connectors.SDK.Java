@@ -31,7 +31,9 @@ import java.util.Map;
  * @see Builder
  */
 public final class ServiceSettings {
+    private static final String CURRENT_VERSION = "1.1.0";
     private static final String DEFAULT_SCOPE = "https://management.azure.com/.default";
+    private static final String DEFAULT_APPLICATION_NAME = "RecordPoint Java SDK v" + CURRENT_VERSION;
     private final String baseUrl;
 
     private final String tenantId;
@@ -39,6 +41,7 @@ public final class ServiceSettings {
     private final String secret;
     private final String scope;
     private final String connectorId;
+    private final String applicationName;
 
     /**
      * Constructs a {@link ServiceSettings} instance using the provided builder.
@@ -52,6 +55,7 @@ public final class ServiceSettings {
         this.secret = builder.secret;
         this.scope = builder.scope != null ? builder.scope : DEFAULT_SCOPE;
         this.connectorId = builder.connectorId;
+        this.applicationName = builder.applicationName != null ? builder.applicationName : DEFAULT_APPLICATION_NAME;
     }
 
     /**
@@ -61,6 +65,15 @@ public final class ServiceSettings {
      */
     public static Builder Builder() {
         return new Builder();
+    }
+
+    /**
+     * Gets the current version number for troubleshooting purposes.
+     *
+     * @return  the current version number.
+     */
+    public static String getCurrentVersion() {
+        return CURRENT_VERSION;
     }
 
     /**
@@ -117,6 +130,15 @@ public final class ServiceSettings {
         return connectorId;
     }
 
+    /**
+     * Gets the application name.
+     *
+     * @return the application name.
+     */
+    public String getApplicationName() {
+        return applicationName;
+    }
+
     public enum Regions {
         AUE("https://connector-aue.records365.com.au"),
         CAC("https://connector-cac.records365.ca"),
@@ -148,6 +170,7 @@ public final class ServiceSettings {
         private String secret;
         private String scope;
         private String connectorId;
+        private String applicationName;
 
         /**
          * Sets the base URL for the service.
@@ -227,6 +250,17 @@ public final class ServiceSettings {
         }
 
         /**
+         * Sets the application name.
+         *
+         * @param applicationName the application name.
+         * @return this {@link Builder} instance.
+         */
+        public Builder setApplicationName(String applicationName) {
+            this.applicationName = applicationName;
+            return this;
+        }
+
+        /**
          * Sets all the settings from a json file.
          *
          * @param jsonFile path to the json file.
@@ -241,6 +275,7 @@ public final class ServiceSettings {
             this.secret = settings.get("ClientSecret");
             this.scope = settings.get("Audience");
             this.connectorId = settings.get("ConnectorId");
+            this.applicationName = settings.get("ApplicationName");
             return this;
         }
 

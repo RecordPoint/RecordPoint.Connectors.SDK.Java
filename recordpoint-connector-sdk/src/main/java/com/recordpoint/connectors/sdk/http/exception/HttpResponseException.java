@@ -1,13 +1,10 @@
 package com.recordpoint.connectors.sdk.http.exception;
 
 import com.google.common.io.CharStreams;
-import com.recordpoint.connectors.sdk.http.ErrorResponse;
 import com.recordpoint.connectors.sdk.http.HttpResponse;
-import com.recordpoint.connectors.sdk.json.JsonMapperException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Exception to represent an HTTP response error.
@@ -23,11 +20,6 @@ public class HttpResponseException extends Exception {
     private final int statusCode;
 
     /**
-     * Title of the error.
-     */
-    private final String title;
-
-    /**
      * Detailed message of the error.
      */
     private final String detail;
@@ -40,7 +32,6 @@ public class HttpResponseException extends Exception {
     public HttpResponseException(Builder builder) {
         super(builder.detail);
         this.statusCode = builder.statusCode;
-        this.title = builder.title;
         this.detail = builder.detail;
     }
 
@@ -60,15 +51,6 @@ public class HttpResponseException extends Exception {
      */
     public int getStatusCode() {
         return statusCode;
-    }
-
-    /**
-     * Returns the title of the error.
-     *
-     * @return the title.
-     */
-    public String getTitle() {
-        return title;
     }
 
     /**
@@ -92,11 +74,6 @@ public class HttpResponseException extends Exception {
         int statusCode;
 
         /**
-         * Title of the error.
-         */
-        String title;
-
-        /**
          * Detailed message of the error.
          */
         String detail;
@@ -109,15 +86,14 @@ public class HttpResponseException extends Exception {
          */
         public Builder fromHttpResponse(HttpResponse response) {
             try {
-                if (response.getContentType().contains("json")) {
-                    ErrorResponse error = response.parseAs(ErrorResponse.class);
-                    this.statusCode = response.getStatusCode();
-                    this.title = "API Error";
-                    this.detail = error.getError().getMessage();
-                } else {
-                    setDefaultError(response.getStatusCode(), CharStreams.toString(new InputStreamReader(response.getContent(), StandardCharsets.UTF_8)));
-                }
-            } catch (IOException | JsonMapperException e) {
+                String body = CharStreams.toString(
+                        new InputStreamReader(response.getContent(), response.getContentCharset())
+                );
+                this.statusCode = response.getStatusCode();
+                this.detail = "API request failed with status code " + response.getStatusCode() + (
+                        body.isEmpty() ? "" : " and body: " + body
+                );
+            } catch (IOException e) {
                 return setDefaultError(response.getStatusCode(), e.getMessage());
             }
             return this;
@@ -135,17 +111,6 @@ public class HttpResponseException extends Exception {
          */
         public Builder setStatusCode(int statusCode) {
             this.statusCode = statusCode;
-            return this;
-        }
-
-        /**
-         * Sets the title of the error.
-         *
-         * @param title the title of the error.
-         * @return the builder instance.
-         */
-        public Builder setTitle(String title) {
-            this.title = title;
             return this;
         }
 
@@ -169,7 +134,6 @@ public class HttpResponseException extends Exception {
          */
         private Builder setDefaultError(int statusCode, String unexpectedError) {
             this.statusCode = statusCode;
-            this.title = "Unexpected Error";
             this.detail = unexpectedError;
             return this;
         }

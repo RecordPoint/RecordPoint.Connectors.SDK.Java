@@ -161,8 +161,6 @@ public class HttpRequestTest {
 
             HttpResponseException exception = assertThrows(HttpResponseException.class,
                     () -> aggregationClient.getAggregationList(request));
-
-            assertEquals("API Error", exception.getTitle());
         }
 
         @Disabled
@@ -231,7 +229,6 @@ public class HttpRequestTest {
 
             HttpResponseException exception = assertThrows(HttpResponseException.class,
                     () -> aggregationClient.submitAggregation(request));
-            assertEquals("API Error", exception.getTitle());
             assertNotNull(exception.getMessage());
         }
 
@@ -284,7 +281,6 @@ public class HttpRequestTest {
             HttpResponseException exception = assertThrows(HttpResponseException.class,
                     () -> connectorClient.getConnectorConfiguration(request));
 
-            assertEquals("API Error", exception.getTitle());
             assertNotEquals(0, exception.getStatusCode());
             assertNotNull(exception.getMessage());
         }

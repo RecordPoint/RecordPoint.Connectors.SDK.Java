@@ -54,7 +54,6 @@ public final class TokenRequest implements Closeable {
             throw new TokenResponseException(
                     HttpResponseException.Builder()
                             .setStatusCode(ex.statusCode())
-                            .setTitle(ex.errorCode())
                             .setDetail(ex.getMessage()));
         }
     }

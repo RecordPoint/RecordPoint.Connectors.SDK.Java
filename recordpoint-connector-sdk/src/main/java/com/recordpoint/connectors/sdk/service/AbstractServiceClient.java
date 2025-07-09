@@ -50,9 +50,22 @@ public abstract class AbstractServiceClient {
         Preconditions.checkNotNull(builder.serviceSettings, "Service settings cannot be null");
         Preconditions.checkNotNull(builder.serviceSettings.getBaseUrl(), "Base URL in ServiceSettings cannot be null");
         this.rootUrl = builder.serviceSettings.getBaseUrl();
-        this.requestFactory = builder.getTransport().createRequestFactory(builder.getRequestInitializer());
+
+        this.requestFactory = builder.getTransport().createRequestFactory(getHttpRequestInitializer(builder));
         this.jsonMapper = builder.getJsonParser();
         this.tokenManager = builder.getTokenManager();
+    }
+
+    private HttpRequestInitializer getHttpRequestInitializer(Builder builder) {
+        HttpRequestInitializer initializer = builder.getRequestInitializer();
+        final String applicationName = builder.serviceSettings.getApplicationName();
+
+        return request -> {
+            request.addHeader("User-Agent", applicationName);
+            if (initializer != null) {
+                initializer.initialize(request);
+            }
+        };
     }
 
     private static <T extends ServicePayload> StreamingContent getStreamingContent(T payload) {

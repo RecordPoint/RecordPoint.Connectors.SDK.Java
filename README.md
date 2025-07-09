@@ -10,7 +10,7 @@ The RecordPoint Connector SDK is available on Maven Central and can be added to 
 <dependency>
     <groupId>com.recordpoint</groupId>
     <artifactId>recordpoint-connector-sdk</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -69,6 +69,7 @@ OAuth2.0 credentials if using the `MsalTokenManager`. These settings can be defi
 ```java
 ServiceSettings settings = ServiceSettings.Builder()
         .setRegion(ServiceSettings.Regions.CAC)
+        .setApplicationName("Acme Data Connector")
         .setConnectorId("00000000-0000-0000-0000-000000000000")
         .setTenantId("00000000-0000-0000-0000-000000000000")
         .setClientId("client ID goes here")
