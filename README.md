@@ -10,7 +10,7 @@ The RecordPoint Connector SDK is available on Maven Central and can be added to 
 <dependency>
     <groupId>com.recordpoint</groupId>
     <artifactId>recordpoint-connector-sdk</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
@@ -27,7 +27,7 @@ If using Microsoft Entra ID for authentication (the default), the Microsoft `azu
 ```
 
 In some environments and runtimes, the `netty` dependency in `azure-identity` may cause issues and can be replaced with 
-the OKHttpClient instead by including the following instead:
+the OKHttpClient instead by including the following:
 
 ```xml
 <dependency>
@@ -50,7 +50,7 @@ the OKHttpClient instead by including the following instead:
 used in conjunction with the RecordPoint SDK.
 
 ## Java version
-This SDK is designed to work with Java 17 or above.
+This SDK is designed to work with Java 8 or above.
 
 # Documentation
 JavaDoc is available at [javadoc.io](https://javadoc.io/doc/com.recordpoint/recordpoint-connector-sdk/latest/index.html) or see below for helpful examples.
@@ -79,16 +79,6 @@ ServiceSettings settings = ServiceSettings.Builder()
 *Note:* The example above assumes the use of a standard tenant. If using a dedicated
 instance, replace `.setRegion(...)` with `.setBaseUrl("https://connector-.../")`
 
-Alternatively, the JSON file generated from the RecordPoint Connector Administration UI 
-can be used:
-
-```java
-ServiceSettings settings = ServiceSettings.Builder()
-        .fromJsonFile(Path.of("connectorSettings.json"))
-        .setSecret(System.getenv("CLIENT_SECRET"))
-        .build();
-```
-
 These settings can be passed directly to the `MsalTokenManager`:
 ```java
 try (TokenManager tokenManager = new MsalTokenManager(settings)) {
@@ -114,7 +104,7 @@ builder.setExternalId(externalId);
 builder.setLocation("https://example.com/book.pdf");
 builder.setParentExternalId(null);
 builder.setTitle("The Hitchhiker's Guide to the Galaxy");
-builder.setMediaType("Electronic");
+builder.setMediaType(ItemSubmission.MediaType.ELECTRONIC);
 builder.setSourceCreatedBy("Douglas Adams");
 builder.setSourceLastModifiedBy("Thomas Tidholm");
 builder.setParentExternalId("0");
@@ -129,6 +119,12 @@ builder.setSourceProperties(List.of(
         Metadata.of("Category", "Science Fiction"),
         Metadata.of("IsFiction", true)
 ));
+
+// Or alternatively use the OptionalMetadata wrapper for easier null-value handling:
+builder.setSourceProperties(OptionalMetadata.makeSourceProperties(List.of(
+        OptionalMetadata.Builder().of("Foo", 123).orEmpty(),
+        OptionalMetadata.Builder().of("Baz", (String) null).orIgnore()
+)));
 
 SubmitItemRequest request = SubmitItemRequest.Builder()
         .setPayload(builder.build())
@@ -266,6 +262,34 @@ java --add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
      --add-opens=java.base/sun.util.calendar=ALL-UNNAMED \
      -jar target/recordpoint-connector-sdk-spark-sample-1.0.2.jar
 ```
+
+# Troubleshooting
+When raising support requests to RecordPoint support, please include:
+ - SDK Version details
+ - Application name (for tracing network requests)
+ - Debug-level wire logs (if relevant)
+
+## Retrieving version details
+The version details of the SDK can be retrieved from `ServiceSettings` using:
+```java
+System.out.println("Current SDK version: " + ServiceSettings.getCurrentVersion());
+```
+
+## Setting application name
+RecordPoint may utilise the user agent field to differentiate SDK users, manage load and trace network requests. To set
+the user agent, set the `applicationName` property of `ServiceSettings` to a meaningful and unique name for your connector, for example:
+```java
+ServiceSettings settings = ServiceSettings.Builder()
+        .setApplicationName("<company> <connector> <version>")
+        // add additional settings here
+        .build();
+```
+
+## Debug logging
+The SDK makes extensive use of the Apache HttpClient and [enabling debug-level logging for the HttpClient's wire 
+logging](https://hc.apache.org/httpcomponents-client-4.5.x/logging.html) will provide detailed information for
+troubleshooting, including request and response payloads. Please consider sensitivity of the information before
+including these on a ticket.
 
 # License
 Licensed under Apache 2.0, see LICENSE

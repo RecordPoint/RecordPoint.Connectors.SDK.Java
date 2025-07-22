@@ -31,7 +31,7 @@ import java.util.Map;
  * @see Builder
  */
 public final class ServiceSettings {
-    private static final String CURRENT_VERSION = "1.1.0";
+    private static final String CURRENT_VERSION = "1.1.1";
     private static final String DEFAULT_SCOPE = "https://management.azure.com/.default";
     private static final String DEFAULT_APPLICATION_NAME = "RecordPoint Java SDK v" + CURRENT_VERSION;
     private final String baseUrl;
@@ -263,6 +263,7 @@ public final class ServiceSettings {
         /**
          * Sets all the settings from a json file.
          *
+         * @deprecated Since version 1.1.1, with removal planned for 1.2.0
          * @param jsonFile path to the json file.
          * @return this {@link Builder} instance.
          * @throws JsonMapperException if there's an issue with the json file.
