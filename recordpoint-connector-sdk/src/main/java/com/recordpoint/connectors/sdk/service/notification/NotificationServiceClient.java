@@ -20,7 +20,10 @@ public final class NotificationServiceClient extends AbstractServiceClient {
     }
 
     public List<Notification> getNotificationList(GetNotificationRequest request) throws JsonMapperException, HttpExecutionException, HttpResponseException {
-        String resourceUrl = String.format("%s%s?connectorId=%s", getRootUrl(), request.getServicePath(), request.getConnectorId());
+        String resourceUrl = String.format(
+                "%s%s?connectorId=%s&receiveAll=%s", getRootUrl(),
+                request.getServicePath(), request.getConnectorId(), request.getReceiveAll()
+        );
         return getRequestList(resourceUrl, Notification.class);
     }
 

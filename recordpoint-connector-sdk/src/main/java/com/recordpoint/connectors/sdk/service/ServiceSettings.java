@@ -31,7 +31,7 @@ import java.util.Map;
  * @see Builder
  */
 public final class ServiceSettings {
-    private static final String CURRENT_VERSION = "1.1.1";
+    private static final String CURRENT_VERSION = "1.1.2";
     private static final String DEFAULT_SCOPE = "https://management.azure.com/.default";
     private static final String DEFAULT_APPLICATION_NAME = "RecordPoint Java SDK v" + CURRENT_VERSION;
     private final String baseUrl;

@@ -10,7 +10,7 @@ The RecordPoint Connector SDK is available on Maven Central and can be added to 
 <dependency>
     <groupId>com.recordpoint</groupId>
     <artifactId>recordpoint-connector-sdk</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 
@@ -191,6 +191,7 @@ NotificationServiceClient notificationServiceClient = NotificationServiceClient.
 
 List<Notification> notifications = notificationServiceClient.getNotificationList(GetNotificationRequest.Builder()
         .setConnectorId(connectorId)
+        .setReceiveAll(false)
         .build()
 );
 
@@ -203,8 +204,8 @@ for (Notification notification : notifications) {
         );
         // Perform deletion here
     }
-```
-
+}
+````
 Once the item is destroyed, or an non-retryable error has occurred, the notification should be acknowledged so that the
 item can be marked as successfully destroyed or noted that disposal failed:
 
@@ -219,7 +220,6 @@ notificationServiceClient.acknowledgeProcessedNotification(AcknowledgeNotificati
         )
         .build()
 );
-}
 ```
 
 # Examples

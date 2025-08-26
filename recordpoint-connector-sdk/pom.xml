@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.recordpoint</groupId>
     <artifactId>recordpoint-connector-sdk</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <name>Recordpoint Connector SDK for Java</name>
     <url>https://github.com/RecordPoint/RecordPoint.Connectors.SDK.Java</url>
     <description>SDK for integrating with a new connection source to the RecordPoint platform</description>
